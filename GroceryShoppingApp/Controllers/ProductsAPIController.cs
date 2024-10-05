@@ -37,7 +37,7 @@ namespace GroceryShoppingApp.Controllers
         [HttpGet(template: "ListProducts")]
         public ActionResult<List<ProductDto>> ListProducts()
         {
-            // Fetching the products from the database
+            
             List<Product> products = _context.Products.Include(p => p.Carts).ToList();
             List<ProductDto> productDtos = new List<ProductDto>();
 
@@ -168,7 +168,7 @@ namespace GroceryShoppingApp.Controllers
             _context.Products.Update(existingProduct);
             _context.SaveChanges();
 
-            return NoContent(); // 204 No Content
+            return NoContent(); 
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace GroceryShoppingApp.Controllers
             _context.Products.Remove(product);
             _context.SaveChanges();
 
-            return Ok(); // Return success message
+            return Ok(); 
         }
     }
     }
