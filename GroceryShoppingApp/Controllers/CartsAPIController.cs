@@ -47,12 +47,12 @@ namespace GroceryShoppingApp.Controllers
                 
                 string productList = string.Join(", ", cart.Products.Select(p => p.ProductName));
 
-                // Putting the information from the database into a defined package
+                
                 cartDtos.Add(new CartDto()
                 {
                     CartName = cart.CartName,
                     DateCreated = cart.DateCreated,
-                    ProductsInCart = "Products: " + productList,  // Listing product names
+                    ProductsInCart = "Products: " + productList,  
                     CartCustomer = "This cart belongs to " + cart.Customer.CustomerFname + " " + cart.Customer.CustomerLname // Space between names
                 });
             }
