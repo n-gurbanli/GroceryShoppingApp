@@ -1,0 +1,31 @@
+﻿@model GroceryShoppingApp.Models.CartDto
+
+<h2>Create New Cart</h2>
+
+<form method="POST" asp-action="Add" asp-controller="CartPage">
+    <div class="form-group">
+        <label asp-for="CartName" class="control-label"></label>
+        <input asp-for="CartName" class="form-control" />
+        <span asp-validation-for="CartName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="CustomerId">Select Customer</label>
+        <select asp-for="CartCustomer" class="form-control" asp-items="ViewBag.Customers"></select>
+        <span asp-validation-for="CartCustomer" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DateCreated" class="control-label"></label>
+        <input asp-for="DateCreated" class="form-control" type="hidden" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")" />
+        <span asp-validation-for="DateCreated" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-primary" />
+    </div>
+</form>
+
+<a asp-action="List" class="btn btn-secondary">Back to List</a>
+
+

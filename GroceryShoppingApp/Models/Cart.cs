@@ -26,13 +26,17 @@ namespace GroceryShoppingApp.Models
 
     public class CartDto
     {
+        public int CartId { get; set; }
+
         public string CartName { get; set; }
 
         public DateTime DateCreated { get; set; }
 
-        public string ProductsInCart { get; set; }
+        public List<ProductDto> Products { get; set; }
 
         public string CartCustomer { get; set; }
+
+        public int CustomerId { get; set; }
 
 
     }

@@ -1,0 +1,100 @@
+﻿@model IEnumerable<GroceryShoppingApp.Models.ProductDto>
+@{Layout = "~/Views/Shared/_Layout.cshtml";}
+
+
+<h2>Search Products</h2>
+
+<div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search for products..." />
+    <button id="searchButton" onclick="performSearch()">Search</button>
+</div>
+
+<div id="searchResults"></div>
+
+
+
+<h2>Product List</h2>
+
+<div>
+    <a asp-action="New" class="btn btn-primary">Create New</a>
+</div>
+
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model)
+            {
+                <tr>
+                    <td>@product.ProductName</td>
+                    <td>@product.ProductDesc</td>
+                    <td>@product.Category</td>
+                    <td>@product.Price</td>
+                    <td><a asp-action="Details" asp-route-id="@product.ProductId">View Details</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No products available.</p>
+}
+
+@section Scripts {
+    <script>
+        function performSearch() {
+            var query = document.getElementById("searchInput").value;
+
+            if (!query) {
+                alert("Please enter a search term.");
+                return;
+            }
+
+            
+            fetch(`/api/ProductsAPI?query=${encodeURIComponent(query)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displaySearchResults(data);
+                })
+                .catch(error => {
+                    document.getElementById("searchResults").innerHTML = error.message;
+                });
+        }
+
+        function displaySearchResults(products) {
+            const resultsContainer = document.getElementById("searchResults");
+            resultsContainer.innerHTML = ""; 
+
+            if (products.length === 0) {
+                resultsContainer.innerHTML = "No products found.";
+                return;
+            }
+
+            const list = document.createElement("ul");
+
+            products.forEach(product => {
+                const item = document.createElement("li");
+                item.textContent = `${product.productName} - ${product.productDesc} - $${product.price}`;
+                list.appendChild(item);
+            });
+
+            resultsContainer.appendChild(list);
+        }
+    </script>
+}

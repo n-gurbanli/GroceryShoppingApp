@@ -1,0 +1,39 @@
+﻿@model GroceryShoppingApp.Models.CustomerDto
+
+
+<h2>Add New Customer</h2>
+
+<form method="POST" action="/CustomerPage/Add">
+    <div class="form-group">
+        <label asp-for="CustomerFname" class="control-label"></label>
+        <input asp-for="CustomerFname" class="form-control" />
+        <span asp-validation-for="CustomerFname" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CustomerLname" class="control-label"></label>
+        <input asp-for="CustomerLname" class="form-control" />
+        <span asp-validation-for="CustomerLname" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CustomerAddress" class="control-label"></label>
+        <input asp-for="CustomerAddress" class="form-control" />
+        <span asp-validation-for="CustomerAddress" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CustomerEmail" class="control-label"></label>
+        <input asp-for="CustomerEmail" class="form-control" />
+        <span asp-validation-for="CustomerEmail" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CustomerPhone" class="control-label"></label>
+        <input asp-for="CustomerPhone" class="form-control" />
+        <span asp-validation-for="CustomerPhone" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Add Customer" class="btn btn-primary" />
+        <a asp-action="List" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+

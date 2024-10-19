@@ -1,0 +1,16 @@
+﻿@model GroceryShoppingApp.Models.CartDto;
+
+<div class="row">
+    <h2>Confirm Delete</h2>
+    <p>Are you sure you want to delete this Cart?</p>
+
+    <div>
+        <label>Name</label>
+        <div>@Model.CartName</div>
+    </div>
+
+    <form method="POST" action="/CartPage/Delete/@Model.CartId">
+        <input type="submit" value="Delete" class="alert-warning" />
+
+    </form>
+</div>

@@ -1,0 +1,27 @@
+﻿@model IEnumerable<GroceryShoppingApp.Models.CartDto>
+
+<h2>Cart List</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Cart Name</th>
+            <th>Date Created</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cart in Model)
+        {
+            <tr>
+                <td>@cart.CartName</td>
+                <td>@cart.DateCreated.ToShortDateString()</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@cart.CartId">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="New">Create New Cart</a>

@@ -2,8 +2,23 @@ using GroceryShoppingApp.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using System;
+using GroceryShoppingApp.Controllers;
+using GroceryShoppingApp.Interfaces;
+using GroceryShoppingApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+
+// Associate service interfaces with their implementations
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+
+
+
 
 
 // Add services to the container.

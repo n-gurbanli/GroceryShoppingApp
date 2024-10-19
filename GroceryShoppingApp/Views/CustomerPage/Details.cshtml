@@ -1,0 +1,52 @@
+﻿@model GroceryShoppingApp.ViewModels.CustomerDetailsViewModel
+
+<h2>Customer Details</h2>
+
+<div>
+    <h3>@Model.Customer.CustomerFname @Model.Customer.CustomerLname</h3>
+    <p>Address: @Model.Customer.CustomerAddress</p>
+    <p>Email: @Model.Customer.CustomerEmail</p>
+    <p>Phone: @Model.Customer.CustomerPhone</p>
+</div>
+
+<h3>Carts</h3>
+@if (Model.Carts.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Cart ID</th>
+                <th>Cart Name</th>
+                <th>Date Created</th>
+                <th>Products in Cart</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cart in Model.Carts)
+            {
+                <tr>
+                    <td>@cart.CartId</td>
+                    <td>@cart.CartName</td>
+                    <td>@cart.DateCreated.ToShortDateString()</td>
+                    <td>
+                        @if (cart.Products != null && cart.Products.Any())
+                        {
+                            @string.Join(", ", cart.Products.Select(p => p.ProductName))
+                            
+                        }
+                        else
+                        {
+                            <span>No products in this cart.</span> 
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No carts found for this customer.</p>
+}
+
+

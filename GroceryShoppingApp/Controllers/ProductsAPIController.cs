@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using GroceryShoppingApp.Interfaces;
 using GroceryShoppingApp.Models;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using GroceryShoppingApp.Data;
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace GroceryShoppingApp.Controllers
@@ -12,188 +9,148 @@ namespace GroceryShoppingApp.Controllers
     [ApiController]
     public class ProductsAPIController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IProductService _productService;
 
-        public ProductsAPIController(ApplicationDbContext context)
+        public ProductsAPIController(IProductService productService)
         {
-            _context = context;
+            _productService = productService;
         }
 
         /// <summary>
-        /// This method lists products
+        /// Returns the list of products.
         /// </summary>
-        /// <returns>
-        /// [{Products},{Product}]
-        /// </returns>
-        /// <example> 
-        ///   {
-        ///   "ProductName": "Apple",
-        ///   "ProductDesc": "A fresh red apple.",
-        ///   "Category": "Fruits",
-        ///   "Price": "0.99",
-        ///   "Cart": "This product is in Cgherry Pie cart"
-        ///   }
+        /// <returns>A list of ProductDto.</returns>
+        /// /// <example>
+        /// GET: /api/ProductAPI/ListProducts
         /// </example>
-        [HttpGet(template: "ListProducts")]
-        public ActionResult<List<ProductDto>> ListProducts()
+        [HttpGet("ListProducts")]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> ListProducts()
         {
-            // Fetching the products from the database
-            List<Product> products = _context.Products.Include(p => p.Carts).ToList();
-            List<ProductDto> productDtos = new List<ProductDto>();
-
-            foreach (Product product in products)
-            {
-                
-                string cartNames = string.Join(", ", product.Carts.Select(c => c.CartName));
-                productDtos.Add(new ProductDto()
-                {
-                    ProductName = product.ProductName,
-                    ProductDesc = product.ProductDesc,
-                    Category = product.Category,
-                    Price = product.Price.ToString(),
-                    Cart = !string.IsNullOrEmpty(cartNames) ? "This product is in " + cartNames : "This product is not in any cart"
-                });
-            }
-
-            return productDtos;
+            var productDtos = await _productService.ListProducts();
+            return Ok(productDtos);
         }
 
         /// <summary>
-        /// Finding a product through its unique id
+        /// Finds a product by its ID.
         /// </summary>
-        /// <param name="id">ProductId, for example /1</param>
-        /// <returns>
-        /// Returns product info if found, otherwise shows an error
-        /// </returns>
-        /// <example>
-        /// /api/ProductsAPI/Find/1
+        /// <param name="id">Product ID.</param>
+        /// /// <example>
+        /// GET: /api/ProductAPI/5
         /// </example>
-        [HttpGet(template: "Find/{id}")]
-        public ActionResult<ProductDto> Find(int id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> FindProduct(int id)
         {
-            var product = _context.Products.Include(p => p.Carts).FirstOrDefault(p => p.ProductId == id);
-
-            if (product == null)
+            var productDto = await _productService.FindProduct(id);
+            if (productDto == null)
             {
-                return NotFound($"Product with ID {id} not found.");
+                return NotFound("Product not found.");
             }
-
-            string cartNames = string.Join(", ", product.Carts.Select(c => c.CartName));
-            var productDto = new ProductDto()
-            {
-                ProductName = product.ProductName,
-                ProductDesc = product.ProductDesc,
-                Category = product.Category,
-                Price = product.Price.ToString(),
-                Cart = !string.IsNullOrEmpty(cartNames) ? "This product is in " + cartNames : "This product is not in any cart"
-            };
-
             return Ok(productDto);
         }
 
         /// <summary>
-        /// Creating a new product
+        /// Adds a Product
         /// </summary>
-        /// <param name="productDto">The transfer object that outputs product info</param>
-        /// <returns>
-        /// Creates a new product, or returns an error if the input is invalid
-        /// </returns>
+        /// <param name="ProductDto">The required information to add the Product (ProductName, ProductDesc, Category, Price)</param>
+        /// 
         /// <example>
-        /// /api/ProductsAPI/Create
-        /// {
-        ///     "ProductName": "Banana",
-        ///     "ProductDesc": "A ripe banana.",
-        ///     "Category": "Fruits",
-        ///     "Price": "0.50"
-        /// }
+        /// POST: api/Product/Add
         /// </example>
-        [HttpPost(template: "Create")]
-        public IActionResult Create([FromBody] ProductDto productDto)
+        [HttpPost("Add")] // Use route attribute to define the endpoint
+        public async Task<ActionResult<Product>> AddProduct([FromBody] ProductDto productDto) 
         {
-            if (productDto == null)
+            ServiceResponse response = await _productService.AddProduct(productDto);
+
+            if (response.Status == ServiceResponse.ServiceStatus.NotFound)
             {
-                return BadRequest("Product data is null.");
+                return NotFound(response.Messages);
+            }
+            else if (response.Status == ServiceResponse.ServiceStatus.Error)
+            {
+                return StatusCode(500, response.Messages);
             }
 
-            var product = new Product()
-            {
-                ProductName = productDto.ProductName,
-                ProductDesc = productDto.ProductDesc,
-                Category = productDto.Category,
-                Price = decimal.Parse(productDto.Price) //converting decimal
-            };
-
-            _context.Products.Add(product);
-            _context.SaveChanges();
-
-            return CreatedAtAction(nameof(Find), new { id = product.ProductId }, productDto);
+            
+            return Created($"api/Product/FindProduct/{response.CreatedId}", productDto); 
         }
 
         /// <summary>
-        /// Updating an existing product
+        /// Updates an existing product.
         /// </summary>
-        /// <param name="id">ProductId</param>
-        /// <param name="productDto">Updated product info</param>
-        /// <returns>
-        /// Returns the updated product or an error if the product is not found
-        /// </returns>
+        /// <param name="id">Product ID.</param>
+        /// <param name="productDto">Updated product data.</param>
         /// <example>
-        /// /api/ProductsAPI/Update/1
-        /// {
-        ///     "ProductName": "Updated Apple",
-        ///     "ProductDesc": "A fresh green apple.",
-        ///     "Category": "Fruits",
-        ///     "Price": "1.00"
-        /// }
+        /// PUT: /api/ProductAPI/5 (body returns updated product)
         /// </example>
-        [HttpPut(template: "Update/{id}")]
-        public IActionResult Update(int id, [FromBody] ProductDto productDto)
+        [HttpPut("Update/{id}")]
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductDto productDto)
         {
-            if (productDto == null)
+            productDto.ProductId = id; 
+            var serviceResponse = await _productService.UpdateProduct(productDto);
+            if (serviceResponse.Status == ServiceResponse.ServiceStatus.NotFound)
             {
-                return BadRequest("Product data is null.");
+                return NotFound(serviceResponse.Messages);
             }
-
-            var existingProduct = _context.Products.Find(id);
-            if (existingProduct == null)
-            {
-                return NotFound();
-            }
-
-            existingProduct.ProductName = productDto.ProductName;
-            existingProduct.ProductDesc = productDto.ProductDesc;
-            existingProduct.Category = productDto.Category;
-            existingProduct.Price = decimal.Parse(productDto.Price);
-
-            _context.Products.Update(existingProduct);
-            _context.SaveChanges();
-
-            return NoContent(); // 204 No Content
+            return NoContent();
         }
 
         /// <summary>
-        /// Deleting a product
+        /// Deletes a product by its ID.
         /// </summary>
-        /// <param name="id">ProductId</param>
-        /// <returns>
-        /// Returns a success message if deleted, or an error if the product is not found
-        /// </returns>
-        /// <example>
-        /// /api/ProductsAPI/Delete/1
+        /// <param name="id">Product ID.</param>
+        /// /// <example>
+        /// DELETE: /api/ProductAPI/Delete/5
         /// </example>
-        [HttpDelete(template: "Delete/{id}")]
-        public IActionResult Delete(int id)
+        [HttpDelete("Delete/{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = _context.Products.Find(id);
-            if (product == null)
+            var serviceResponse = await _productService.DeleteProduct(id);
+            if (serviceResponse.Status == ServiceResponse.ServiceStatus.NotFound)
             {
-                return NotFound();
+                return NotFound(serviceResponse.Messages);
+            }
+            return NoContent();
+        }
+
+        //I will build this View in the future, unfortunetly I didn't have enough time to debug (Swagger is not working)
+        /// <summary>
+        /// Retrieves a list of products that belong to a specific category.
+        /// </summary>
+        /// <param name="category">The category name to filter products by.</param>
+        /// <example>
+        /// GET: /api/ProductAPI/ByCategory/Dairy
+        /// </example>
+        [HttpGet("ByCategory/{category}")]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(string category)
+        {
+            if (string.IsNullOrWhiteSpace(category))
+            {
+                return BadRequest("Category cannot be empty."); 
             }
 
-            _context.Products.Remove(product);
-            _context.SaveChanges();
+            var products = await _productService.GetProductsByCategory(category);
+            if (products == null || !products.Any())
+            {
+                return NotFound("No products found for the specified category.");
+            }
+            return Ok(products);
+        }
 
-            return Ok(); // Return success message
+        [HttpGet]
+        public async Task<IActionResult> Search(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return BadRequest("Search query cannot be empty.");
+            }
+
+            var products = await _productService.SearchProducts(query);
+            if (products == null || !products.Any())
+            {
+                return NotFound("No products found matching the search criteria.");
+            }
+            return Ok(products);
         }
     }
-    }
+}
+

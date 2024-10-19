@@ -1,0 +1,30 @@
+﻿@model GroceryShoppingApp.Models.ProductDto
+
+<h2>Edit Product</h2>
+
+<form method="POST" action="/ProductPage/Update/@Model.ProductId">
+    <div style="display:none">
+        <input name="ProductId" value="@Model.ProductId" />
+    </div>
+    <div>
+        <label for="ProductName">Product Name:</label>
+        <input type="text" name="ProductName" id="ProductName" value="@Model.ProductName" />
+    </div>
+    <div>
+        <label for="ProductDesc">Product Description:</label>
+        <textarea name="ProductDesc" id="ProductDesc">@Model.ProductDesc</textarea>
+    </div>
+    <div>
+        <label for="Category">Category:</label>
+        <input type="text" name="Category" id="Category" value="@Model.Category" />
+    </div>
+    <div>
+        <label for="Price">Product Price:</label>
+        <input type="text" name="Price" id="Price" value="@Model.Price" />
+    </div>
+    <div>
+        <input type="submit" value="Update Product" class="btn btn-primary" />
+    </div>
+</form>
+
+<a asp-action="List" class="btn btn-secondary">Back to Product List</a>

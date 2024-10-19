@@ -1,0 +1,29 @@
+﻿@model GroceryShoppingApp.Models.ProductDto
+
+<h2>Add New Product</h2>
+
+﻿<form method="POST" action="/ProductPage/Add">
+    <div>
+        <label for="ProductName">Product Name:</label>
+        <input type="text" name="ProductName" id="ProductName" />
+    </div>
+    <div>
+        <label for="ProductDesc">Product Description:</label>
+        <textarea name="ProductDesc" id="ProductDesc"></textarea>
+    </div>
+    <div>
+        <label for="Category">Category:</label>
+        <input type="text" name="Category" id="Category"/>
+    </div>
+    <div>
+        <label for="Price">Product Price:</label>
+        <input type="text" name="Price" id="Price" />
+    </div>
+    <div>
+        <input type="submit" value="Add Product" />
+    </div>
+</form>
+
+
+
+

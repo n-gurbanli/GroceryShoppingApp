@@ -1,0 +1,17 @@
+﻿@model GroceryShoppingApp.Models.CartDto
+
+<h2>Cart Details</h2>
+
+<div>
+    <h3>Cart Name: @Model.CartName</h3>
+    <p>Date Created: @Model.DateCreated.ToShortDateString()</p>
+    <p>Customer: @Model.CartCustomer</p>
+</div>
+
+
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.CartId" class="btn btn-primary">Edit</a>
+    <a asp-action="DeleteConfirmation" asp-route-id="@Model.CartId" class="btn btn-danger">Delete</a>
+</div>
+

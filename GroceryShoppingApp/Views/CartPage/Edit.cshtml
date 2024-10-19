@@ -1,0 +1,31 @@
+﻿@model GroceryShoppingApp.Models.CartDto
+
+
+
+<h2>Edit Cart</h2>
+
+<form method="POST" action="/CartPage/Edit/@Model.CartId">
+    <div class="form-group">
+        <label asp-for="CartName" class="control-label"></label>
+        <input asp-for="CartName" class="form-control" />
+        <span asp-validation-for="CartName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="CustomerId">Select Customer</label>
+        <select asp-for="CustomerId" class="form-control" asp-items="ViewBag.Customers"></select>
+        <span asp-validation-for="CustomerId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Date Created</label>
+        <div>@Model.DateCreated.ToString("g")</div>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Save Changes" class="btn btn-primary" />
+    </div>
+</form>
+
+<a asp-action="List">Back to List</a>
+
